@@ -1,9 +1,13 @@
-flag = True
 while True:
     try:
-        num1 = int(input("Enter a number: "))
+        num1 = float(input("Enter a number: "))
         choise = input("Выберите операцию: + - * /   (0) - Выход: ")
-        num2 = int(input("Enter a number: "))
+        if choise == "0":
+            print("Выход")
+            break
+
+        num2 = float(input("Enter a number: "))
+
         if choise == "+":
             print(num1 + num2)
 
@@ -14,10 +18,10 @@ while True:
             print(num1 * num2)
 
         elif choise == "/":
-            print(num1 / num2)
-
-        elif choise == "0":
-            flag = False
+            try:
+                print(num1 / num2)
+            except ZeroDivisionError:
+                print("Ошибка. На ноль делить нельзя")
 
         else:
             print("Ошибка выбора операции:")
