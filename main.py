@@ -1,29 +1,136 @@
-while True:
+# Импортируем библиотеку tkinter и даем ей короткое имя tk для удобства
+import tkinter as tk
+# Импортируем модуль messagebox, который позволяет показывать всплывающие окна с сообщениями
+from tkinter import messagebox
+
+# Определяем функцию calculate, которая будет вызываться при нажатии кнопки "Вычислить"
+def calculate():
+    # Получаем текст из первого поля ввода и сохраняем в переменную num1_str
+    num1_str = entry_num1.get()
+    # Получаем текст из второго поля ввода и сохраняем в переменную num2_str
+    num2_str = entry_num2.get()
+    # Получаем значение переменной operation_var, в которой хранится выбранная операция (+, -, *, /)
+    operation = operation_var.get()
+
+    # Проверяем, не пустая ли строка operation (т.е. выбрана ли операция)
+    if not operation:
+        # Если операция не выбрана, показываем окно с ошибкой
+        messagebox.showerror("Ошибка", "Выберите операцию!")
+        # Завершаем выполнение функции, чтобы дальше не выполнялся код
+        return
+
+    # Проверяем, заполнены ли оба поля ввода (не пустые ли строки)
+    if not num1_str or not num2_str:
+        # Если хотя бы одно поле пустое, показываем ошибку
+        messagebox.showerror("Ошибка", "Введите оба числа!")
+        # Выходим из функции
+        return
+
+    # Пытаемся преобразовать введенные строки в числа
     try:
-        num1 = float(input("Enter a number: "))
-        choise = input("Выберите операцию: + - * /   (0) - Выход: ")
-        if choise == "0":
-            print("Выход")
-            break
+        # Преобразуем первую строку в число с плавающей точкой
+        num1 = float(num1_str)
+        # Преобразуем вторую строку в число с плавающей точкой
+        num2 = float(num2_str)
+    except ValueError:
+        # Если возникла ошибка преобразования (например, введены буквы), показываем сообщение
+        messagebox.showerror("Ошибка", "Ошибка: вводите только цифры!")
+        # Выходим из функции
+        return
 
-        num2 = float(input("Enter a number: "))
+    # Проверяем, какая операция выбрана, и выполняем соответствующее действие
+    if operation == "+":
+        # Если сложение, складываем числа
+        result = num1 + num2
+    elif operation == "-":
+        # Если вычитание, вычитаем
+        result = num1 - num2
+    elif operation == "*":
+        # Если умножение, умножаем
+        result = num1 * num2
+    elif operation == "/":
+        # Если деление, пытаемся выполнить деление с обработкой ошибки деления на ноль
+        try:
+            result = num1 / num2
+        except ZeroDivisionError:
+            # Если попытка деления на ноль, показываем ошибку
+            messagebox.showerror("Ошибка", "На ноль делить нельзя!")
+            # Выходим из функции
+            return
+    else:
+        # Если по какой-то причине операция не распознана (такого не должно случиться)
+        messagebox.showerror("Ошибка", "Неизвестная операция!")
+        return
 
-        if choise == "+":
-            print(num1 + num2)
+    # Изменяем текст метки label_result, чтобы отобразить результат вычисления
+    # Преобразуем число result в строку и передаем в config
+    label_result.config(text=str(result))
 
-        elif choise == "-":
-            print(num1 - num2)
+# Определяем функцию exit_app для выхода из программы
+def exit_app():
+    # Уничтожаем главное окно, что приводит к завершению программы
+    root.destroy()
 
-        elif choise == "*":
-            print(num1 * num2)
+# Создаем главное окно приложения
+root = tk.Tk()
+# Устанавливаем заголовок окна
+root.title("Калькулятор")
+# Устанавливаем размер окна: ширина 300 пикселей, высота 250
+root.geometry("300x250")
+# Запрещаем пользователю изменять размер окна (по горизонтали и вертикали)
+root.resizable(False, False)
 
-        elif choise == "/":
-            try:
-                print(num1 / num2)
-            except ZeroDivisionError:
-                print("Ошибка. На ноль делить нельзя")
+# Создаем специальную переменную tkinter, которая будет хранить выбранную операцию
+# Она будет автоматически обновляться при выборе радиокнопок
+operation_var = tk.StringVar()
 
-        else:
-            print("Ошибка выбора операции:")
-    except ValueError as e:
-        print(f"Ошибка, вводите цифры")
+# Создаем метку с текстом "Число 1:" и размещаем ее в окне
+# pady=(10, 0) добавляет отступ сверху 10 пикселей
+tk.Label(root, text="Число 1:").pack(pady=(10, 0))
+# Создаем поле ввода для первого числа, шириной 20 символов
+entry_num1 = tk.Entry(root, width=20)
+# Размещаем поле ввода в окне (по умолчанию сверху вниз)
+entry_num1.pack()
+
+# Создаем метку для текста "Операция:" и размещаем с отступом сверху 10
+tk.Label(root, text="Операция:").pack(pady=(10, 0))
+
+# Создаем рамку (Frame) для размещения кнопок операций в одну линию
+frame_ops = tk.Frame(root)
+# Размещаем рамку в окне
+frame_ops.pack()
+
+# Создаем радиокнопку для операции сложения, привязываем к переменной operation_var со значением "+"
+# Размещаем ее внутри рамки слева (side=tk.LEFT) с отступом по бокам 5 пикселей
+tk.Radiobutton(frame_ops, text="+", variable=operation_var, value="+").pack(side=tk.LEFT, padx=5)
+# Аналогично для вычитания
+tk.Radiobutton(frame_ops, text="-", variable=operation_var, value="-").pack(side=tk.LEFT, padx=5)
+# Для умножения
+tk.Radiobutton(frame_ops, text="*", variable=operation_var, value="*").pack(side=tk.LEFT, padx=5)
+# Для деления
+tk.Radiobutton(frame_ops, text="/", variable=operation_var, value="/").pack(side=tk.LEFT, padx=5)
+
+# Создаем метку для "Число 2:" с отступом сверху 10
+tk.Label(root, text="Число 2:").pack(pady=(10, 0))
+# Создаем поле ввода для второго числа
+entry_num2 = tk.Entry(root, width=20)
+# Размещаем поле ввода
+entry_num2.pack()
+
+# Создаем кнопку "Вычислить", при нажатии вызывается функция calculate, ширина кнопки 15
+btn_calc = tk.Button(root, text="Вычислить", command=calculate, width=15)
+# Размещаем кнопку с отступом сверху 10 пикселей
+btn_calc.pack(pady=10)
+
+# Создаем метку для вывода результата, шрифт Arial размер 12
+label_result = tk.Label(root, text="Результат: ", font=("Arial", 12))
+# Размещаем метку с отступом сверху 5
+label_result.pack(pady=5)
+
+# Создаем кнопку "Выход", при нажатии вызывается функция exit_app
+btn_exit = tk.Button(root, text="Выход", command=exit_app, width=15)
+# Размещаем кнопку с отступом сверху 5
+btn_exit.pack(pady=5)
+
+# Запускаем главный цикл обработки событий tkinter, который держит окно открытым и реагирует на действия пользователя
+root.mainloop()
